@@ -24,6 +24,9 @@ class TelegramROSBridge(object):
         """
         self._caption_as_frame_id = caption_as_frame_id
 
+        # Whitelisted users is a mapping from a name (for your reference) to id
+        self._whitelisted_users = rospy.get_param("~whitelisted_users", {})
+
         self._from_telegram_string_publisher = rospy.Publisher("message_to_ros", String, queue_size=10)
         self._from_telegram_image_publisher = rospy.Publisher("image_to_ros", Image, queue_size=10)
         self._from_telegram_location_publisher = rospy.Publisher("location_to_ros", NavSatFix, queue_size=10)
@@ -61,6 +64,24 @@ class TelegramROSBridge(object):
 
         self._telegram_updater.stop()
 
+    def allow_only_registered(callback_function):
+        """
+        Decorator to restrict telegram methods only to registered users
+        :param callback_function: A callback function taking a telegram.Bot and a telegram.Update
+        :return: Wrapped callback function
+        """
+
+        @functools.wraps(callback_function)
+        def wrapper(self, bot, update):
+            self._whitelisted_users = rospy.get_param("~whitelisted_users", {})
+            if update.message.from_user.id in self._whitelisted_users.values():
+                callback_function(self, bot, update)
+            else:
+                rospy.logwarn("Discarding message. User {} not whitelisted".format(update.message.from_user))
+                update.message.reply_text("You are not authorized to chat with this bot")
+        return wrapper
+
+    @allow_only_registered
     def _telegram_start_callback(self, _, update):
         """
         Called when a telegram user sends the '/start' event to the bot, using this event, the bridge can be connected
