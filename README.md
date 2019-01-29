@@ -47,9 +47,6 @@ If you don't have a bot yet, chat to [BotFather](https://core.telegram.org/bots#
 - `message_from_ros` ([std_msgs/String](http://docs.ros.org/api/std_msgs/html/msg/String.html))
 - `image_from_ros` ([sensor_msgs/Image](http://docs.ros.org/api/sensor_msgs/html/msg/Image.html))
 
-### Services
-- `add_user_to_whitelist` ([telegram_ros/AddUserToWhitelist](http://docs.ros.org/api/telegram_ros/html/srv/AddUserToWhitelist.html))
-
 ### Parameters
 
 - `~token` (string): Telegram BOT API token
