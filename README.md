@@ -3,7 +3,8 @@
 Bridges between a [Telegram](https://telegram.org/) conversation and [ROS](http://ros.org).
 
 Only a single Telegram user can send and receive text, images and locations to/from the ROS bridge.
-A user must send the `/start` command to start a conversation. A new user can then `/start` as well and take over. 
+A user must send the `/start` command to start a conversation. A new user can then `/start` as well and take over.
+Once connected, a user can type `/stop` to disconnect
 
 Currently, there is *no* authentication (Issue #6)
 
@@ -43,11 +44,13 @@ If you don't have a bot yet, chat to [BotFather](https://core.telegram.org/bots#
 
 - `message_to_ros` ([std_msgs/String](http://docs.ros.org/api/std_msgs/html/msg/String.html))
 - `image_to_ros` ([sensor_msgs/Image](http://docs.ros.org/api/sensor_msgs/html/msg/Image.html))
+- `location_to_ros` ([sensor_msgs/NavSatFix](http://docs.ros.org/api/sensor_msgs/html/msg/NavSatFix.html))
 
 #### Input
 
 - `message_from_ros` ([std_msgs/String](http://docs.ros.org/api/std_msgs/html/msg/String.html))
 - `image_from_ros` ([sensor_msgs/Image](http://docs.ros.org/api/sensor_msgs/html/msg/Image.html))
+- `location_from_ros` ([sensor_msgs/NavSatFix](http://docs.ros.org/api/sensor_msgs/html/msg/NavSatFix.html))
 
 ### Parameters
 

@@ -49,6 +49,7 @@ class TelegramROSBridge(object):
             lambda _, update, error: rospy.logerr("Update {} caused error {}".format(update, error)))
 
         self._telegram_updater.dispatcher.add_handler(CommandHandler("start", self._telegram_start_callback))
+        self._telegram_updater.dispatcher.add_handler(CommandHandler("stop", self._telegram_stop_callback))
         self._telegram_updater.dispatcher.add_handler(MessageHandler(Filters.text, self._telegram_message_callback))
         self._telegram_updater.dispatcher.add_handler(MessageHandler(Filters.photo, self._telegram_photo_callback))
         self._telegram_updater.dispatcher.add_handler(
@@ -73,6 +74,7 @@ class TelegramROSBridge(object):
         This checks whether the user is on the whitelist if the whitelist is a list and allows any user if whitelist is False
         :param update: Received update event that holds the chat_id and message data
         """
+        
         self._whitelist = rospy.get_param(WHITELIST, False)
         if self._whitelist == False or isinstance(self._whitelist, list) and update.message.from_user.id in self._whitelist:
             if self._telegram_chat_id is not None and self._telegram_chat_id != update.message.chat_id:
@@ -87,6 +89,19 @@ class TelegramROSBridge(object):
         else:
             rospy.logwarn("Discarding message. User {} not whitelisted".format(update.message.from_user))
             update.message.reply_text("You (chat id {}) are not authorized to chat with this bot".format(update.message.from_user['id']))
+
+    @telegram_callback
+    def _telegram_stop_callback(self, _, update):
+        """
+        Called when a telegram user sends the '/stop' event to the bot. Then, the user is disconnected from the bot and
+        will no longer receive messages.
+        :param update: Received update event that holds the chat_id and message data
+        """
+
+        rospy.loginfo("Stopping telegram ROS bridge for chat id {}".format(self._telegram_chat_id))
+        update.message.reply_text("Disconnecting chat_id {}. So long and thanks for all the fish!"
+                                  " Type /start to reconnect".format(self._telegram_chat_id))
+        self._telegram_chat_id = None
 
     def telegram_callback(callback_function):
         """
