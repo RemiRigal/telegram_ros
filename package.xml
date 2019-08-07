@@ -16,5 +16,5 @@
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>python-numpy</exec_depend>
   <exec_depend>python-opencv</exec_depend>
-  <exec_depend>python-telegram-bot</exec_depend>
+  <!--exec_depend>python-telegram-bot</exec_depend-->
 </package>

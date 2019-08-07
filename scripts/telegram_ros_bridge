@@ -10,7 +10,7 @@ from StringIO import StringIO
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image, NavSatFix
 from std_msgs.msg import String, Header
-from telegram import Location
+from telegram import Location, ParseMode
 from telegram.error import TimedOut
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
@@ -48,8 +48,8 @@ class TelegramROSBridge(object):
         if self._telegram_chat_id is not None:
             rospy.loginfo("Using chat id '{}'".format(self._telegram_chat_id))
             rospy.loginfo("Starting telegram ROS bridge for chat id {}".format(self._telegram_chat_id))
-            text = "{0}\n{1}\n{0}".format("".join(["="] * 50), "Starting new log session")
-            self._telegram_updater.bot.send_message(self._telegram_chat_id, text)
+            text = "{0}\n{1}\n{0}".format("".join(["="] * 20), "_Starting new log session_")
+            self._telegram_updater.bot.send_message(self._telegram_chat_id, text, parse_mode=ParseMode.MARKDOWN)
             self._telegram_updater.bot.send_message(self._telegram_chat_id, "Telegram ROS bridge initialized. Type /stop to disconnect".format(self._telegram_chat_id))
 
     def spin(self):
@@ -61,6 +61,7 @@ class TelegramROSBridge(object):
 
         rospy.spin()
         rospy.loginfo("Shutting down telegram updater ...")
+        self._telegram_updater.bot.send_message(self._telegram_chat_id, "_Telegram node shutting down..._", parse_mode=ParseMode.MARKDOWN)
 
         self._telegram_updater.stop()
 
@@ -148,7 +149,7 @@ class TelegramROSBridge(object):
         Called when a new ROS String message is coming in that should be send to the telegram conversation
         :param msg: String message
         """
-        self._telegram_updater.bot.send_message(self._telegram_chat_id, msg.data)
+        self._telegram_updater.bot.send_message(self._telegram_chat_id, msg.data, parse_mode=ParseMode.MARKDOWN)
 
     @telegram_callback
     def _telegram_photo_callback(self, _, update):
