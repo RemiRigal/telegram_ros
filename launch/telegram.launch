@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<launch>
+
+	<node name="telegram_ros_bridge" pkg="telegram_ros" type="telegram_ros_bridge" output="screen">
+		<param name="token"  value="$(env TELEGRAM_TOKEN)"  if="$(eval env('TELEGRAM_TOKEN') != '')"/>
+		<param name="chatId" value="$(env TELEGRAM_CHATID)" if="$(eval env('TELEGRAM_CHATID') != '')"/>
+	</node>
+
+</launch>
