@@ -36,7 +36,7 @@ class TelegramROSBridge(object):
         self._cv_bridge = CvBridge()
 
         # Telegram IO
-        self._telegram_chat_id = os.getenv("TELEGRAM_CHATID", None)
+        self._telegram_chat_id = int(os.getenv("TELEGRAM_CHATID", None))
         self._telegram_updater = Updater(api_token)
         self._telegram_updater.dispatcher.add_error_handler(lambda _, update, error: rospy.logerr("Update {} caused error {}".format(update, error)))
 
@@ -45,6 +45,7 @@ class TelegramROSBridge(object):
         self._telegram_updater.dispatcher.add_handler(MessageHandler(Filters.text, self._telegram_message_callback))
         self._telegram_updater.dispatcher.add_handler(MessageHandler(Filters.photo, self._telegram_photo_callback))
         self._telegram_updater.dispatcher.add_handler(MessageHandler(Filters.location, self._telegram_location_callback))
+        self._telegram_updater.dispatcher.add_handler(MessageHandler(Filters.command, self._telegram_command_callback))
 
         if self._telegram_chat_id is not None:
             rospy.loginfo("Using chat id '{}'".format(self._telegram_chat_id))
@@ -142,6 +143,16 @@ class TelegramROSBridge(object):
         :param update: Received update that holds the chat_id and message data
         """
         text = update.message.text.encode('utf-8')
+        self._from_telegram_string_publisher.publish(String(data=text))
+
+    @telegram_callback
+    def _telegram_command_callback(self, _, update):
+        """
+        Called when a new telegram message has been received. The method will verify whether the incoming message is
+        from the bridges telegram conversation by comparing the chat_id.
+        :param update: Received update that holds the chat_id and message data
+        """
+        text = update.message.text.encode('utf-8').split("@")[0]
         self._from_telegram_string_publisher.publish(String(data=text))
 
     @ros_callback
