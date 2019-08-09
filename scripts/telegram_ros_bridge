@@ -3,6 +3,7 @@
 
 import functools
 import os
+import sys
 import cv2
 import numpy as np
 import rospy
@@ -35,7 +36,7 @@ class TelegramROSBridge(object):
         self._cv_bridge = CvBridge()
 
         # Telegram IO
-        self._telegram_chat_id = rospy.get_param("~chatId", None)
+        self._telegram_chat_id = os.getenv("TELEGRAM_CHATID", None)
         self._telegram_updater = Updater(api_token)
         self._telegram_updater.dispatcher.add_error_handler(lambda _, update, error: rospy.logerr("Update {} caused error {}".format(update, error)))
 
@@ -212,7 +213,7 @@ if __name__ == '__main__':
     rospy.init_node('telegram_ros_bridge')
     try:
         bridge = TelegramROSBridge(
-            rospy.get_param('~token'),
+            os.getenv("TELEGRAM_TOKEN"),
             rospy.get_param('~caption_as_frame_id', False)
         )
         bridge.spin()
